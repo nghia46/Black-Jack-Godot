@@ -1,0 +1,111 @@
+[gd_scene load_steps=5 format=3 uid="uid://b34yihlc38r5t"]
+
+[ext_resource type="Script" path="res://Scripts/BlackjackGame.cs" id="2_olcyr"]
+[ext_resource type="Script" path="res://Scripts/Deck.cs" id="2_uinm8"]
+[ext_resource type="Script" path="res://Scripts/Player.cs" id="3_6vlyl"]
+[ext_resource type="Script" path="res://Scripts/Dealer.cs" id="4_dpdgx"]
+
+[node name="MainGame" type="Node2D"]
+script = ExtResource("2_olcyr")
+
+[node name="Deck" type="Node2D" parent="."]
+script = ExtResource("2_uinm8")
+
+[node name="Player" type="Node2D" parent="."]
+script = ExtResource("3_6vlyl")
+
+[node name="Dealer" type="Node2D" parent="."]
+script = ExtResource("4_dpdgx")
+
+[node name="UI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Panel" type="Panel" parent="UI"]
+layout_mode = 0
+offset_right = 1161.0
+offset_bottom = 661.0
+
+[node name="Hit" type="Button" parent="UI/Panel"]
+layout_mode = 2
+offset_left = 19.0
+offset_top = 582.0
+offset_right = 276.0
+offset_bottom = 625.0
+tooltip_text = "drawing a new card"
+text = "Hit"
+
+[node name="Stood" type="Button" parent="UI/Panel"]
+layout_mode = 2
+offset_left = 18.0
+offset_top = 534.0
+offset_right = 275.0
+offset_bottom = 577.0
+tooltip_text = "Stop drawing card"
+text = "Stood"
+
+[node name="NewGameBtn" type="Button" parent="UI/Panel"]
+layout_mode = 2
+offset_left = 982.0
+offset_top = 507.0
+offset_right = 1111.0
+offset_bottom = 617.0
+tooltip_text = "Get a new game"
+text = "New game"
+
+[node name="PlayerCardTxt" type="RichTextLabel" parent="UI/Panel"]
+clip_contents = false
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -147.0
+offset_top = -175.0
+offset_right = 147.0
+offset_bottom = -112.0
+grow_horizontal = 2
+grow_vertical = 0
+tooltip_text = "This is your card rank"
+text = "Player Card"
+fit_content = true
+
+[node name="MessageTxt" type="RichTextLabel" parent="UI/Panel"]
+clip_contents = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -147.0
+offset_top = -31.5
+offset_right = 147.0
+offset_bottom = 31.5
+grow_horizontal = 2
+grow_vertical = 2
+tooltip_text = "Result"
+text = "Message"
+fit_content = true
+
+[node name="DealerCardTxt" type="RichTextLabel" parent="UI/Panel"]
+clip_contents = false
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -147.0
+offset_top = 66.0
+offset_right = 147.0
+offset_bottom = 129.0
+grow_horizontal = 2
+tooltip_text = "Dealer Hand"
+text = "Dealer Hand"
+fit_content = true
+
+[connection signal="button_down" from="UI/Panel/Hit" to="." method="_on_hit_button_down"]
+[connection signal="button_down" from="UI/Panel/Stood" to="." method="_on_stood_button_down"]
+[connection signal="button_down" from="UI/Panel/NewGameBtn" to="." method="_on_new_game_btn_button_down"]
