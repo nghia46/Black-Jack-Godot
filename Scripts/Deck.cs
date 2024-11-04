@@ -10,7 +10,7 @@ public partial class Deck : Node
     // Create a new deck of cards
     public void CreateDeck()
     {
-        string[] suits = { "Hearts", "Diamonds", "Clubs", "Spades" };
+        string[] suits = { "♥️", "♦️", "♣️", "♠️" };
         string[] ranks = { "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K" };
 
         foreach (var suit in suits)
