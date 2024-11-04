@@ -11,6 +11,7 @@ public partial class BlackjackGame : Node
     // UI Elements
     [Export] private Button hitButton;
     [Export] private Button stoodButton;
+    [Export] private Button newGameButton; // Reference to the New Game button
     [Export] private Label playerScoreLabel;
     [Export] private Label dealerScoreLabel;
     [Export] private Label resultLabel;
@@ -26,6 +27,7 @@ public partial class BlackjackGame : Node
     // State and flags
     private bool isDealerCardHidden = true;
     private bool isAnimating = false;
+    private bool isGameInProgress = false; 
 
     public override void _Ready()
     {
@@ -35,6 +37,7 @@ public partial class BlackjackGame : Node
     private async void StartGame()
     {
         ResetGameUI();
+        isGameInProgress = true;
         deck.CreateDeck();
         deck.ShuffleDeck();
         await DealInitialCardsWithAnimation();
@@ -45,6 +48,7 @@ public partial class BlackjackGame : Node
     {
         hitButton.Disabled = false;
         stoodButton.Disabled = false;
+        newGameButton.Disabled = true; 
         isDealerCardHidden = true;
         player.ClearHand();
         dealer.ClearHand();
@@ -177,6 +181,8 @@ public partial class BlackjackGame : Node
         resultLabel.Text = resultMessage;
         hitButton.Disabled = true;
         stoodButton.Disabled = true;
+        newGameButton.Disabled = false; // Enable New Game button at the end
+        isGameInProgress = false; // Game ends
     }
 
     public void HandleNewGame()

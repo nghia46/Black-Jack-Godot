@@ -107,13 +107,14 @@ _data = {
 "RESET": SubResource("Animation_ui0y6")
 }
 
-[node name="MainGame" type="Node2D" node_paths=PackedStringArray("deck", "player", "dealer", "hitButton", "stoodButton", "playerScoreLabel", "dealerScoreLabel", "resultLabel", "playerCardContainer", "dealerCardContainer", "animationPlayer")]
+[node name="MainGame" type="Node2D" node_paths=PackedStringArray("deck", "player", "dealer", "hitButton", "stoodButton", "newGameButton", "playerScoreLabel", "dealerScoreLabel", "resultLabel", "playerCardContainer", "dealerCardContainer", "animationPlayer")]
 script = ExtResource("2_olcyr")
 deck = NodePath("Deck")
 player = NodePath("Player")
 dealer = NodePath("Dealer")
 hitButton = NodePath("MainCanvas/UI/Htood-Hit-MarginContainer/HBoxContainer/Hit")
 stoodButton = NodePath("MainCanvas/UI/Htood-Hit-MarginContainer/HBoxContainer/Stood")
+newGameButton = NodePath("MainCanvas/UI/NewGameMarginContainer/NewGameBtn")
 playerScoreLabel = NodePath("MainCanvas/UI/PlayerCardScoreMarginContainer/ScoreCardHFlowContainer/ScoreMarginContainer/Score")
 dealerScoreLabel = NodePath("MainCanvas/UI/DearlerCardScoreMarginContainer2/ScoreCardHFlowContainer/ScoreMarginContainer/Score")
 resultLabel = NodePath("MainCanvas/UI/ResultContainer/Result")
