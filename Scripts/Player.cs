@@ -4,9 +4,11 @@ using Godot;
 
 public partial class Player : Node
 {
+    public int Money { get; set; } = 1000;
     public List<Card> Hand { get; private set; } = new List<Card>();
     public bool HasStood { get; set; } = false;
-    
+    public int BetAmount { get; private set; } = 0; // Store current bet amount
+
     // Method to add a card to the player's hand
     public void AddCard(Card card)
     {
@@ -61,5 +63,21 @@ public partial class Player : Node
     public void ClearHand()
     {
         Hand.Clear();
+    }
+
+    public void PlaceBet(int amount)
+    {
+        BetAmount = amount; // Set the bet amount
+        Money -= amount; // Deduct the bet from the player's money
+    }
+
+    public void WinBet(int amount)
+    {
+        Money += amount * 2; // Win back the bet plus winnings (e.g., double)
+    }
+
+    public void ReturnBet(int amount)
+    {
+        Money += amount; // Return the bet amount
     }
 }
