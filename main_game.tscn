@@ -1,15 +1,117 @@
-[gd_scene load_steps=5 format=3 uid="uid://b34yihlc38r5t"]
+[gd_scene load_steps=11 format=3 uid="uid://b34yihlc38r5t"]
 
 [ext_resource type="Script" path="res://Scripts/BlackjackGame.cs" id="2_olcyr"]
 [ext_resource type="Script" path="res://Scripts/Deck.cs" id="2_uinm8"]
 [ext_resource type="Script" path="res://Scripts/Player.cs" id="3_6vlyl"]
 [ext_resource type="Script" path="res://Scripts/Dealer.cs" id="4_dpdgx"]
+[ext_resource type="PackedScene" uid="uid://dtyiwdqpdg645" path="res://Prefabs/card.tscn" id="5_b1je3"]
+[ext_resource type="Texture2D" uid="uid://bvnhoni1xrhus" path="res://Images/BG.png" id="6_yk2da"]
 
-[node name="MainGame" type="Node2D" node_paths=PackedStringArray("deck", "player", "dealer", "hitButton", "stoodButton", "playerScoreLabel", "dealerScoreLabel", "resultLabel", "playerCardContainer", "dealerCardContainer")]
+[sub_resource type="Animation" id="Animation_ptau7"]
+resource_name = "DrawingCard"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("MainCanvas/UI/Card:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.00376913, 1),
+"transitions": PackedFloat32Array(0.36137, 0.36137),
+"update": 0,
+"values": [Vector2(76, 105), Vector2(525, 370)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("MainCanvas/UI/Card:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.0333333, 0.133333, 0.9, 1),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_ui0y6"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("MainCanvas/UI/Card:size")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(100, 132)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("MainCanvas/UI/Card:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(76, 105)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("MainCanvas/UI/Card:modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_h58xp"]
+resource_name = "DealerDrawCard"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("MainCanvas/UI/Card:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(76, 105), Vector2(500, 100)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("MainCanvas/UI/Card:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.0333333, 0.333333, 0.866667, 1),
+"transitions": PackedFloat32Array(1, 1, 11.7127, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_0h7ud"]
+_data = {
+"DealerDrawCard": SubResource("Animation_h58xp"),
+"DrawingCard": SubResource("Animation_ptau7"),
+"RESET": SubResource("Animation_ui0y6")
+}
+
+[node name="MainGame" type="Node2D" node_paths=PackedStringArray("deck", "player", "dealer", "hitButton", "stoodButton", "playerScoreLabel", "dealerScoreLabel", "resultLabel", "playerCardContainer", "dealerCardContainer", "animationPlayer")]
 script = ExtResource("2_olcyr")
-deck = NodePath("MainCanvas/Deck")
-player = NodePath("MainCanvas/Player")
-dealer = NodePath("MainCanvas/Dealer")
+deck = NodePath("Deck")
+player = NodePath("Player")
+dealer = NodePath("Dealer")
 hitButton = NodePath("MainCanvas/UI/Htood-Hit-MarginContainer/HBoxContainer/Hit")
 stoodButton = NodePath("MainCanvas/UI/Htood-Hit-MarginContainer/HBoxContainer/Stood")
 playerScoreLabel = NodePath("MainCanvas/UI/PlayerCardScoreMarginContainer/ScoreCardHFlowContainer/ScoreMarginContainer/Score")
@@ -17,17 +119,18 @@ dealerScoreLabel = NodePath("MainCanvas/UI/DearlerCardScoreMarginContainer2/Scor
 resultLabel = NodePath("MainCanvas/UI/ResultContainer/Result")
 playerCardContainer = NodePath("MainCanvas/UI/PlayerCardScoreMarginContainer/ScoreCardHFlowContainer/PlayerCard")
 dealerCardContainer = NodePath("MainCanvas/UI/DearlerCardScoreMarginContainer2/ScoreCardHFlowContainer/DealerCard")
+animationPlayer = NodePath("AnimationPlayer")
 
-[node name="MainCanvas" type="CanvasLayer" parent="."]
-
-[node name="Deck" type="Node2D" parent="MainCanvas"]
+[node name="Deck" type="Node2D" parent="."]
 script = ExtResource("2_uinm8")
 
-[node name="Dealer" type="Node2D" parent="MainCanvas"]
+[node name="Dealer" type="Node2D" parent="."]
 script = ExtResource("4_dpdgx")
 
-[node name="Player" type="Node2D" parent="MainCanvas"]
+[node name="Player" type="Node2D" parent="."]
 script = ExtResource("3_6vlyl")
+
+[node name="MainCanvas" type="CanvasLayer" parent="."]
 
 [node name="UI" type="Control" parent="MainCanvas"]
 layout_mode = 3
@@ -36,6 +139,40 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="TextureRect" type="TextureRect" parent="MainCanvas/UI"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("6_yk2da")
+
+[node name="Deck2" type="Panel" parent="MainCanvas/UI"]
+layout_mode = 0
+offset_left = 93.0
+offset_top = 143.0
+offset_right = 193.0
+offset_bottom = 275.0
+size_flags_horizontal = 0
+
+[node name="Deck3" type="Panel" parent="MainCanvas/UI"]
+layout_mode = 0
+offset_left = 93.0
+offset_top = 143.0
+offset_right = 193.0
+offset_bottom = 255.0
+size_flags_horizontal = 0
+
+[node name="Card" type="Panel" parent="MainCanvas/UI"]
+modulate = Color(1, 1, 1, 0)
+layout_mode = 0
+offset_left = 76.0
+offset_top = 105.0
+offset_right = 176.0
+offset_bottom = 237.0
+size_flags_horizontal = 0
 
 [node name="ResultContainer" type="AspectRatioContainer" parent="MainCanvas/UI"]
 layout_mode = 1
@@ -81,6 +218,9 @@ text = "(5/12)"
 layout_mode = 2
 size_flags_horizontal = 4
 
+[node name="Card" parent="MainCanvas/UI/PlayerCardScoreMarginContainer/ScoreCardHFlowContainer/PlayerCard" instance=ExtResource("5_b1je3")]
+layout_mode = 2
+
 [node name="DearlerCardScoreMarginContainer2" type="MarginContainer" parent="MainCanvas/UI"]
 layout_mode = 1
 anchors_preset = 10
@@ -98,6 +238,9 @@ alignment = 1
 [node name="DealerCard" type="VFlowContainer" parent="MainCanvas/UI/DearlerCardScoreMarginContainer2/ScoreCardHFlowContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
+
+[node name="Card" parent="MainCanvas/UI/DearlerCardScoreMarginContainer2/ScoreCardHFlowContainer/DealerCard" instance=ExtResource("5_b1je3")]
+layout_mode = 2
 
 [node name="ScoreMarginContainer" type="MarginContainer" parent="MainCanvas/UI/DearlerCardScoreMarginContainer2/ScoreCardHFlowContainer"]
 layout_mode = 2
@@ -150,10 +293,15 @@ theme_override_constants/margin_right = 20
 theme_override_constants/margin_bottom = 20
 
 [node name="NewGameBtn" type="Button" parent="MainCanvas/UI/NewGameMarginContainer"]
-custom_minimum_size = Vector2(150, 150)
+custom_minimum_size = Vector2(125, 125)
 layout_mode = 2
 tooltip_text = "Get a new game"
 text = "New game"
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_0h7ud")
+}
 
 [connection signal="button_down" from="MainCanvas/UI/Htood-Hit-MarginContainer/HBoxContainer/Hit" to="." method="_on_hit_button_down"]
 [connection signal="button_down" from="MainCanvas/UI/Htood-Hit-MarginContainer/HBoxContainer/Stood" to="." method="_on_stood_button_down"]

@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Godot;
 
 public partial class BlackjackGame : Node
@@ -16,124 +17,136 @@ public partial class BlackjackGame : Node
     [Export] private VFlowContainer playerCardContainer;
     [Export] private VFlowContainer dealerCardContainer;
 
-    // Load the card display scene for instancing cards in the UI
+    // Animation
+    [Export] private AnimationPlayer animationPlayer;
+
+    // Card scene
     private PackedScene cardDisplayScene = GD.Load<PackedScene>("res://Prefabs/card.tscn");
+
+    // State and flags
+    private bool isDealerCardHidden = true;
+    private bool isAnimating = false;
 
     public override void _Ready()
     {
         StartGame();
     }
 
-    private void StartGame()
+    private async void StartGame()
     {
-        // Enable the buttons at the start of a new game
-        stoodButton.Disabled = false;
-        hitButton.Disabled = false;
-
-        // Reset player and dealer hands
-        player.ClearHand();
-        dealer.ClearHand();
-
-        // Reset and shuffle the deck
+        ResetGameUI();
         deck.CreateDeck();
         deck.ShuffleDeck();
-
-        // Deal initial cards
-        player.AddCard(deck.DrawCard());
-        player.AddCard(deck.DrawCard());
-        dealer.AddCard(deck.DrawCard());
-        dealer.AddCard(deck.DrawCard());
-
-        // Display both player and dealer hands in the UI
-        DisplayPlayerHand();
-        DisplayDealerHand();
+        await DealInitialCardsWithAnimation();
         UpdateScoreLabels();
     }
 
-    private void DisplayPlayerHand()
+    private void ResetGameUI()
     {
-        // Clear existing displayed cards first to avoid duplicates
-        foreach (Node child in playerCardContainer.GetChildren())
-        {
-            child.QueueFree();
-        }
+        hitButton.Disabled = false;
+        stoodButton.Disabled = false;
+        isDealerCardHidden = true;
+        player.ClearHand();
+        dealer.ClearHand();
+        ClearCardContainer(playerCardContainer);
+        ClearCardContainer(dealerCardContainer);
+        playerScoreLabel.Text = string.Empty;
+        dealerScoreLabel.Text = string.Empty; 
+        resultLabel.Text = string.Empty;
+    }
 
-        // Add each card in the player's hand to the UI
-        foreach (var card in player.Hand)
+    private async Task DealInitialCardsWithAnimation()
+    {
+        for (int i = 0; i < 2; i++)
         {
-            CreateAndAddCardDisplay(card, playerCardContainer);
+            await DealCardWithAnimation(player, playerCardContainer, "DrawingCard");
+            await DealCardWithAnimation(dealer, dealerCardContainer, "DealerDrawCard");
         }
     }
 
-    private void DisplayDealerHand()
+    private async Task DealCardWithAnimation(Player recipient, VFlowContainer container, string animationName)
     {
-        // Clear existing displayed cards first to avoid duplicates
-        foreach (Node child in dealerCardContainer.GetChildren())
-        {
-            child.QueueFree();
-        }
+        recipient.AddCard(deck.DrawCard());
+        await PlayAnimation(animationName);
+        UpdateHandDisplay(recipient, container, recipient == dealer && isDealerCardHidden);
+    }
 
-        // Add each card in the dealer's hand to the UI
-        foreach (var card in dealer.Hand)
+    private async Task PlayAnimation(string animationName)
+    {
+        isAnimating = true;
+        animationPlayer.Play(animationName);
+        await ToSignal(animationPlayer, "animation_finished");
+        isAnimating = false;
+    }
+
+    private void UpdateHandDisplay(Player player, VFlowContainer container, bool hideSecondCard = false)
+    {
+        ClearCardContainer(container);
+        for (int i = 0; i < player.Hand.Count; i++)
         {
-            CreateAndAddCardDisplay(card, dealerCardContainer);
+            var cardDisplay = (CardDisplay)cardDisplayScene.Instantiate();
+            cardDisplay.SetCard(player.Hand[i].Rank, player.Hand[i].Suit);
+            if (i == 1 && hideSecondCard)
+            {
+                cardDisplay.SetHidden(true);
+            }
+            container.AddChild(cardDisplay);
         }
     }
 
-    private void CreateAndAddCardDisplay(Card card, VFlowContainer container)
+    private void ClearCardContainer(VFlowContainer container)
     {
-        // Instantiate a new CardDisplay node and set its properties
-        var cardDisplay = (CardDisplay)cardDisplayScene.Instantiate();
-        cardDisplay.SetCard(card.Rank, card.Suit);
-        container.AddChild(cardDisplay);
+        foreach (Node child in container.GetChildren())
+        {
+            child.QueueFree();
+        }
     }
 
     private void UpdateScoreLabels()
     {
-        // Calculate scores once and avoid redundant calls
         var playerScore = player.CalculateScore();
         var dealerScore = dealer.CalculateScore();
 
-        // Update score labels
         playerScoreLabel.Text = $"{playerScore.maxScore}/{playerScore.minScore}";
-        dealerScoreLabel.Text = $"{dealerScore.maxScore}/{dealerScore.minScore}";
+        dealerScoreLabel.Text = isDealerCardHidden ? "?" : $"{dealerScore.maxScore}/{dealerScore.minScore}";
     }
 
-    public void HandlePlayerHit()
+    public async void HandlePlayerHit()
     {
-        // Add a new card to the player's hand
-        player.AddCard(deck.DrawCard());
+        if (isAnimating) return;
 
-        // Update the player's hand display and score
-        DisplayPlayerHand();
-        UpdateScoreLabels();
-
-        // Check if the player busted
-        if (player.IsBusted())
+        await ExecutePlayerAction(async () =>
         {
-            GD.Print("Player busted!");
-            EndGame("Dealer wins! Player busted.");
-        }
+            await DealCardWithAnimation(player, playerCardContainer, "DrawingCard");
+            UpdateScoreLabels();
+
+            if (player.IsBusted())
+            {
+                EndGame("Dealer wins! Player busted.");
+            }
+        });
     }
 
-    public void HandlePlayerStand()
+    public async void HandlePlayerStand()
     {
-        // Disable the buttons to prevent further actions
-        stoodButton.Disabled = true;
-        hitButton.Disabled = true;
+        if (isAnimating) return;
 
-        // Dealer's turn to draw cards if needed
+        stoodButton.Disabled = true;
+        isDealerCardHidden = false;
+
+        UpdateHandDisplay(dealer, dealerCardContainer);
+        UpdateScoreLabels();
+        await DealerDrawCardsAsync();
+        DetermineWinner();
+    }
+
+    private async Task DealerDrawCardsAsync()
+    {
         while (dealer.ShouldDrawCard())
         {
-            dealer.AddCard(deck.DrawCard());
+            await DealCardWithAnimation(dealer, dealerCardContainer, "DealerDrawCard");
+            UpdateScoreLabels();
         }
-
-        // Update the dealer's hand and score display
-        DisplayDealerHand();
-        UpdateScoreLabels();
-
-        // Determine the winner based on final scores
-        DetermineWinner();
     }
 
     private void DetermineWinner()
@@ -161,36 +174,29 @@ public partial class BlackjackGame : Node
 
     private void EndGame(string resultMessage)
     {
-        // Print the result and disable the hit and stand buttons
         resultLabel.Text = resultMessage;
-        stoodButton.Disabled = true;
         hitButton.Disabled = true;
-
-        // Optionally, display the result message in the UI (e.g., using a Label or Popup)
+        stoodButton.Disabled = true;
     }
 
     public void HandleNewGame()
     {
-        resultLabel.Text = string.Empty;
-        // Reset the game and UI for a new round
         StartGame();
     }
 
-    // Called when the Hit button is pressed
-    public void _on_hit_button_down()
+    private async Task ExecutePlayerAction(Func<Task> action)
     {
-        HandlePlayerHit();
+        hitButton.Disabled = true;
+        stoodButton.Disabled = true;
+
+        await action();
+
+        hitButton.Disabled = false;
+        stoodButton.Disabled = false;
     }
 
-    // Called when the Stand button is pressed
-    public void _on_stood_button_down()
-    {
-        HandlePlayerStand();
-    }
-
-    // Called when the New Game button is pressed
-    public void _on_new_game_btn_button_down()
-    {
-        HandleNewGame();
-    }
+    // Button signals
+    public void _on_hit_button_down() => HandlePlayerHit();
+    public void _on_stood_button_down() => HandlePlayerStand();
+    public void _on_new_game_btn_button_down() => HandleNewGame();
 }

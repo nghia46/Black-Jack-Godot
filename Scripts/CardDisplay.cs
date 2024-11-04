@@ -11,4 +11,13 @@ public partial class CardDisplay : Panel
 		rankLabel.Text = rank;
 		suitIconLabel.Text = suit;
 	}
+	 // Method to hide or show the card's details
+    public void SetHidden(bool isHidden)
+    {
+        if (isHidden)
+        {
+            rankLabel.Text = "";  // Set to empty to "hide" the card
+            suitIconLabel.Text = ""; // Alternatively, you could use placeholder text like "?"
+        }
+    }
 }
